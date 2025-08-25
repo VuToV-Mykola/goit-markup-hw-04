@@ -1,5 +1,5 @@
 :root {
-  --primary-font: "Roboto", sans-serif;
+  --primary-family: "Roboto", sans-serif;
   --second-family: "Raleway", sans-serif;
   --iris: #4d5ae5;
   --ocean: #404bbf;
@@ -84,7 +84,7 @@ address {
 
 /* Властивість font-family,font-size, font-weight, line-height, letter-spacing, text-align, background-color успадковується більшістю елементів, тому його задають елементу body */
 body {
-  font-family: var(--primary-font);
+  font-family: var(--primary-family);
   font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
@@ -179,10 +179,29 @@ img {
   padding: 24px 0;
 }
 
+.nav-link.current {
+  color: var(--ocean);
+  position: relative;
+}
+
 /* Hover/Focus ефекти */
 .nav-link:hover,
+.nav-link:active,
 .nav-link:focus {
   color: var(--ocean);
+}
+
+.nav-link.current::after {
+  background-color: var(--ocean);
+  position: absolute;
+
+  /* !!! Підкреслення розташоване на -1px від низу посилання !!! */
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  content: "";
 }
 
 /*  address  */
@@ -208,9 +227,12 @@ img {
     linear-gradient(to bottom, rgb(46 47 66 / 70%), rgb(46 47 66 / 70%)),
     url("../images/people-office.jpg");
   background-position: center center;
-  background-size: cover;
+  background-size: 1440px auto;
   background-repeat: no-repeat;
-  width: 100%;
+
+  /* !!! «C2» Фонове зображення та картинка в блоці під хедером не розтягується ширше свого оригінального розміру 1440рх !!! */
+  max-width: 1440px;
+  margin: 0 auto;
   padding: 188px 0;
 }
 
@@ -220,7 +242,7 @@ img {
   line-height: 1.07;
   letter-spacing: 0.02em;
   color: var(--white);
-  background: var(--navy-blue);
+
   max-width: 496px;
   margin: 0 auto 48px;
 }
@@ -356,6 +378,7 @@ img {
 .social-item {
   background-color: var(--iris);
   display: flex;
+  overflow: hidden;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -363,6 +386,12 @@ img {
 
 .social-link {
   padding: 12px;
+}
+
+.social-link:focus,
+.social-link:hover,
+.social-link:active {
+  background-color: var(--green);
 }
 
 /*  portfolio  */
@@ -437,4 +466,16 @@ img {
 .footer-text {
   color: var(--cloud);
   max-width: 264px;
+}
+
+.footer .container {
+  display: flex;
+  gap: 120px;
+}
+
+.social-text {
+  font-weight: 500;
+
+  color: var(--white);
+  margin-bottom: 16px;
 }
