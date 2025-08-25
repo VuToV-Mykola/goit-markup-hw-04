@@ -391,7 +391,7 @@ img {
 .social-link:focus,
 .social-link:hover,
 .social-link:active {
-  background-color: var(--green);
+  background-color: var(--ocean);
 }
 
 /*  portfolio  */
@@ -478,4 +478,10 @@ img {
 
   color: var(--white);
   margin-bottom: 16px;
+}
+
+.footer .social-link:focus,
+.footer .social-link:hover,
+.footer .social-link:active {
+  background-color: var(--green);
 }
