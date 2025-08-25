@@ -183,9 +183,7 @@ img {
   padding: 24px 0;
 
   /*  CSS-переходи */
-  transition:
-    color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: color 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-link.current {
@@ -296,8 +294,21 @@ img {
 }
 
 /*  features  */
+.icon-container {
+  background-color: #f4f4fd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 112px;
+  margin-bottom: 8px;
+  border: 1px solid #8e8f99;
+  border-radius: 4px;
+}
+
 .features-list {
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 24px;
 }
 
@@ -310,10 +321,6 @@ img {
   /* !!! Встановлюємо базовий розмір flex-елемента: 4 елементи в рядок із проміжком 72px між ними !!! */
   flex-basis: calc((100% - 72px) / 4);
   gap: 8px;
-}
-
-.features-item .icon {
-  margin: 24px auto;
 }
 
 .features-subtitle {
