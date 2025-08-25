@@ -177,6 +177,11 @@ img {
   font-weight: 500;
   color: var(--navy-blue);
   padding: 24px 0;
+
+  /*  CSS-переходи */
+  transition:
+    color,
+    background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
 .nav-link.current {
@@ -213,6 +218,9 @@ img {
 
 .contacts .contacts-link {
   color: var(--slate);
+
+  /*  CSS-переходи */
+  transition: color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
 .contacts-link:hover,
@@ -267,12 +275,15 @@ img {
   border-radius: 4px;
   box-shadow: 0 4px 4px 0 rgb(0 0 0 / 15%);
   cursor: pointer;
+
+  /*  CSS-переходи */
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
 .hero-btn:hover,
 .hero-btn:focus {
   font-weight: 600;
-  background: var(--ocean);
+  background-color: var(--ocean);
 }
 
 .hero-btn:active {
@@ -332,11 +343,14 @@ img {
     0 2px 1px 0 rgb(46 47 66 / 8%),
     0 1px 1px 0 rgb(46 47 66 / 16%),
     0 1px 6px 0 rgb(46 47 66 / 8%);
+
+  /*  CSS-переходи */
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
 .team-item:hover,
 .team-item:focus {
-  background: var(--white);
+  background-color: var(--white);
 }
 
 .team-title {
@@ -386,6 +400,9 @@ img {
 
 .social-link {
   padding: 12px;
+
+  /*  CSS-переходи */
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
 .social-link:focus,
@@ -416,8 +433,41 @@ img {
 }
 
 .portfolio-item {
+  position: relative;
   flex-basis: calc((100% - 48px) / 3);
+  overflow: hidden;
   border-bottom: 1px solid var(--cornflower);
+
+  /*  CSS-переходи */
+  transition:
+    box-shadow,
+    transform 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+.portfolio-item:focus,
+.portfolio-item:hover,
+.portfolio-item:active {
+  box-shadow:
+    0 2px 1px 0 rgb(46 47 66 / 8%),
+    0 1px 1px 0 rgb(46 47 66 / 16%),
+    0 1px 6px 0 rgb(46 47 66 / 8%);
+}
+
+.overlay {
+  color: var(--cloud);
+  background-color: var(--iris);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 40px 32px;
+  transform: translateY(100%);
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+.portfolio-item:hover .overlay {
+  transform: translateY(0);
 }
 
 .portfolio-descr {
