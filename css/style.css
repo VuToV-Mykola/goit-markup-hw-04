@@ -132,6 +132,10 @@ img {
 /* header */
 .header {
   border-bottom: 1px solid var(--cornflower);
+  box-shadow:
+    0 2px 1px rgb(46 47 66 / 8%),
+    0 1px 1px rgb(46 47 66 / 16%),
+    0 1px 6px rgb(46 47 66 / 8%);
 }
 
 .header .container {
@@ -180,7 +184,7 @@ img {
 
   /*  CSS-переходи */
   transition:
-    color,
+    color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
     background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
@@ -235,7 +239,8 @@ img {
     linear-gradient(to bottom, rgb(46 47 66 / 70%), rgb(46 47 66 / 70%)),
     url("../images/people-office.jpg");
   background-position: center center;
-  background-size: 1440px auto;
+  background-size: cover;
+
   background-repeat: no-repeat;
 
   /* !!! «C2» Фонове зображення та картинка в блоці під хедером не розтягується ширше свого оригінального розміру 1440рх !!! */
@@ -390,19 +395,23 @@ img {
 }
 
 .social-item {
-  background-color: var(--iris);
-  display: flex;
-  overflow: hidden;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
 }
 
 .social-link {
-  padding: 12px;
+  background-color: var(--iris);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  /*  CSS-переходи */
-  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+.social-icon {
+  fill: var(--cloud);
 }
 
 .social-link:focus,
@@ -440,7 +449,7 @@ img {
 
   /*  CSS-переходи */
   transition:
-    box-shadow,
+    box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
     transform 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
@@ -497,6 +506,10 @@ img {
   padding: 100px 0;
 }
 
+.logo-container {
+  margin-right: 120px;
+}
+
 .footer-logo {
   font-family: var(--second-family);
   font-size: 18px;
@@ -520,18 +533,44 @@ img {
 
 .footer .container {
   display: flex;
-  gap: 120px;
+  align-items: baseline;
 }
 
-.social-text {
+.footer-social-text {
   font-weight: 500;
-
   color: var(--white);
   margin-bottom: 16px;
 }
 
-.footer .social-link:focus,
-.footer .social-link:hover,
-.footer .social-link:active {
+.footer-social-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer-social-item {
+  width: 40px;
+  height: 40px;
+}
+
+.footer-social-link {
+  background-color: var(--iris);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.footer-icon {
+  fill: var(--cloud);
+}
+
+.footer-social-link:focus,
+.footer-social-link:hover,
+.footer-social-link:active {
   background-color: var(--green);
 }
