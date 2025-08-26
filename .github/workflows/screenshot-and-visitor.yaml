@@ -279,7 +279,7 @@ jobs:
             echo "SCREENSHOT_CREATED=false" >> $GITHUB_ENV
             exit 0
           fi
-
+          
           SCREENSHOT_CREATED=false
 
           node -e "
@@ -317,21 +317,21 @@ jobs:
                 '--disable-dev-shm-usage',
                 '--disable-web-security',
                 '--disable-features=VizDisplayCompositor',
-                '--headless'
+                '--headless',
+                '--disable-gpu',
+                '--disable-software-rasterizer',
+                '--disable-dev-shm-usage',
+                '--remote-debugging-port=0',
+                '--no-zygote',
+                '--no-first-run',
+                '--disable-extensions'
               ];
-
-              if (process.env.CI) {
-                browserArgs.push('--single-process');
-                browserArgs.push('--no-zygote');
-                browserArgs.push('--no-first-run');
-                browserArgs.push('--disable-extensions');
-              }
 
               browser = await puppeteer.launch({
                 args: browserArgs,
                 executablePath: chromeExecutable,
                 timeout: 60000,
-                dumpio: true
+                dumpio: false  // Убираем детальные логи чтобы избежать ошибок DBus
               });
               
               const page = await browser.newPage();
@@ -396,7 +396,8 @@ jobs:
                   timeout: 60000 
                 });
                 
-                await page.waitForTimeout(5000);
+                // Заменяем waitForTimeout на setTimeout
+                await new Promise(resolve => setTimeout(resolve, 5000));
                 
                 await page.evaluate(async () => {
                   await new Promise(resolve => {
@@ -415,9 +416,13 @@ jobs:
                   });
                 });
                 
-                await page.waitForTimeout(2000);
+                // Заменяем waitForTimeout на setTimeout
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
                 await page.evaluate(() => window.scrollTo(0, 0));
-                await page.waitForTimeout(1000);
+                
+                // Заменяем waitForTimeout на setTimeout
+                await new Promise(resolve => setTimeout(resolve, 1000));
 
                 await page.screenshot({ 
                   path: screenshotPath, 
@@ -486,7 +491,6 @@ jobs:
           fi
 
           rm -f screenshot_output.log
-
       - name: 📝 Update README with all content
         run: |
           REPO_URL="https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}"
