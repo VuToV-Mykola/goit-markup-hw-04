@@ -753,10 +753,8 @@ img {
   /* Нижня рамка елементів portfolio */
   border-bottom: 1px solid var(--cornflower);
 
-  /* Плавний перехід тіні та трансформації */
-  transition:
-    box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Плавний перехід тіні для hover ефекту */
+  transition: box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .portfolio-item:focus,
