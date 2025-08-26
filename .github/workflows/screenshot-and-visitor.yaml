@@ -261,7 +261,8 @@ jobs:
           fi
 
           if [ -d "node_modules/puppeteer" ]; then
-            echo "✅ Puppeteer is available: $(node -e \"console.log(require('./node_modules/puppeteer/package.json').version)\")"
+                        PUPPETEER_VERSION=$(node -e "console.log(require('./node_modules/puppeteer/package.json').version)")
+            echo "✅ Puppeteer is available: $PUPPETEER_VERSION"
           else
             echo "❌ Puppeteer could not be installed - screenshot functionality may not work"
             echo "SCREENSHOT_DEPENDENCIES_AVAILABLE=false" >> $GITHUB_ENV
