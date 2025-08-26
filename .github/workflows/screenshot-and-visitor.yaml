@@ -144,11 +144,11 @@ jobs:
             echo '{"schemaVersion": 1, "label": "⬇️ downloads", "message": "'$TOTAL_DOWNLOADS'", "color": "orange", "style": "'$BADGE_STYLE'"}' > "$DATA_DIR/downloads-badge.json"
           fi
 
-                    # === ТЕХНОЛОГІЧНІ БЕЙДЖІ ===
+          # === ТЕХНОЛОГІЧНІ БЕЙДЖІ ===
           echo "🔧 Generating technology badges..."
           TECH_BADGES=""
 
-          # Додаємо бейдж терминала Mac на початку
+          # Додаємо бейдж терміналу Mac на початку
           TECH_BADGES="$TECH_BADGES[![Terminal](https://img.shields.io/badge/mac%20terminal-000000?style=for-the-badge&logo=apple&logoColor=white&labelColor=000000)](https://support.apple.com/guide/terminal/welcome/mac) "
 
           # Отримуємо мови програмування з GitHub API
@@ -223,64 +223,25 @@ jobs:
           echo "Chrome version: $(google-chrome-stable --version || echo 'Chrome not available')"
 
           echo "📦 Installing Puppeteer..."
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          INSTALL_SUCCESS=false
-
-          while [ $RETRY_COUNT -lt $MAX_RETRIES ] && [ "$INSTALL_SUCCESS" = "false" ]; do
-            echo "Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
-            
-            if [ $RETRY_COUNT -eq 0 ]; then
-              npm config set registry https://registry.npmjs.org/
-              npm install --no-package-lock --no-save puppeteer@latest
-            elif [ $RETRY_COUNT -eq 1 ]; then
-              npm cache clean --force
-              npm install --no-package-lock --no-save puppeteer@latest --fetch-retry-mintimeout 20000 --fetch-retry-maxtimeout 120000
-            else
-              npm install --no-package-lock --no-save puppeteer@latest --ignore-scripts
-            fi
-            
-            if [ -d "node_modules/puppeteer" ] || [ -f "node_modules/puppeteer/package.json" ]; then
-              INSTALL_SUCCESS=true
-              echo "✅ Puppeteer installed successfully"
-            else
-              RETRY_COUNT=$((RETRY_COUNT + 1))
-              echo "❌ Puppeteer installation failed, retrying in 5 seconds..."
-              sleep 5
-            fi
-          done
-
-          if [ "$INSTALL_SUCCESS" = "false" ]; then
-            echo "⚠️ Falling back to puppeteer-core..."
-            npm install --no-package-lock --no-save puppeteer-core@latest
-            
-            if [ -d "node_modules/puppeteer-core" ] && [ ! -d "node_modules/puppeteer" ]; then
-              ln -s puppeteer-core node_modules/puppeteer
-              echo "✅ Using puppeteer-core as fallback"
-            fi
-          fi
+          npm config set registry https://registry.npmjs.org/
+          npm install --no-package-lock --no-save puppeteer@latest --timeout=120000
 
           if [ -d "node_modules/puppeteer" ]; then
-                        PUPPETEER_VERSION=$(node -e "console.log(require('./node_modules/puppeteer/package.json').version)")
+            PUPPETEER_VERSION=$(node -e "console.log(require('./node_modules/puppeteer/package.json').version)")
             echo "✅ Puppeteer is available: $PUPPETEER_VERSION"
+            echo "SCREENSHOT_DEPENDENCIES_AVAILABLE=true" >> $GITHUB_ENV
           else
-            echo "❌ Puppeteer could not be installed - screenshot functionality may not work"
+            echo "❌ Puppeteer could not be installed - screenshot functionality disabled"
             echo "SCREENSHOT_DEPENDENCIES_AVAILABLE=false" >> $GITHUB_ENV
-            exit 0
           fi
 
-          echo "SCREENSHOT_DEPENDENCIES_AVAILABLE=true" >> $GITHUB_ENV
-          echo "✅ All dependencies installed"
-
-      - name: 📸 Generate screenshot
+      - name: 📸 Generate screenshot from GitHub Pages
         run: |
           if [ "$SCREENSHOT_DEPENDENCIES_AVAILABLE" = "false" ]; then
             echo "❌ Screenshot dependencies not available - skipping screenshot"
             echo "SCREENSHOT_CREATED=false" >> $GITHUB_ENV
             exit 0
           fi
-          
-          SCREENSHOT_CREATED=false
 
           node -e "
           const puppeteer = require('puppeteer');
@@ -320,89 +281,66 @@ jobs:
                 '--headless',
                 '--disable-gpu',
                 '--disable-software-rasterizer',
-                '--disable-dev-shm-usage',
                 '--remote-debugging-port=0',
                 '--no-zygote',
                 '--no-first-run',
-                '--disable-extensions'
+                '--disable-extensions',
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-renderer-backgrounding'
               ];
 
               browser = await puppeteer.launch({
                 args: browserArgs,
                 executablePath: chromeExecutable,
-                timeout: 60000,
-                dumpio: false  // Убираем детальные логи чтобы избежать ошибок DBus
+                timeout: 30000,
+                dumpio: false
               });
               
               const page = await browser.newPage();
               await page.setViewport({ width: 1280, height: 800 });
               
               const githubPages = 'https://' + '${{ github.repository_owner }}' + '.github.io/' + '${{ github.event.repository.name }}' + '/';
-              const indexPath = path.join(process.cwd(), 'index.html');
               
-              let targetUrl;
-              let urlType;
-              let shouldTakeScreenshot = false;
-              
-              if (fs.existsSync(indexPath)) {
-                targetUrl = 'file://' + indexPath;
-                urlType = 'local file';
-                shouldTakeScreenshot = true;
-                console.log('📁 Found local index.html file');
-              } else {
-                targetUrl = githubPages;
-                urlType = 'GitHub Pages';
-                console.log('🌐 Checking GitHub Pages availability...');
-                
-                try {
-                  const response = await page.goto(targetUrl, { 
-                    waitUntil: 'networkidle0', 
-                    timeout: 30000 
-                  });
-                  
-                  if (response && response.status() === 200) {
-                    const pageTitle = await page.title();
-                    const pageContent = await page.content();
-                    
-                    const hasMeaningfulContent = pageContent.length > 500 && 
-                                               !pageTitle.includes('404') &&
-                                               !pageContent.includes('There isn\\'t a GitHub Pages site here');
-                    
-                    if (hasMeaningfulContent) {
-                      console.log('✅ GitHub Pages is accessible with meaningful content');
-                      shouldTakeScreenshot = true;
-                    } else {
-                      console.log('❌ GitHub Pages has insufficient content');
-                    }
-                  } else {
-                    console.log('❌ GitHub Pages returned status:', response?.status() || 'unknown');
-                  }
-                } catch (navError) {
-                  console.log('❌ Cannot access GitHub Pages:', navError.message);
-                }
-              }
-              
-              if (!shouldTakeScreenshot) {
-                console.log('🚫 Skipping screenshot - no valid content found');
-                console.log('SCREENSHOT_SUCCESS=false');
-                return;
-              }
-              
-              console.log('🔗 Taking screenshot from', urlType + ':', targetUrl);
+              console.log('🌐 Checking GitHub Pages availability...');
+              console.log('🔗 Target URL:', githubPages);
               
               try {
-                await page.goto(targetUrl, { 
+                const response = await page.goto(githubPages, { 
                   waitUntil: 'networkidle0', 
-                  timeout: 60000 
+                  timeout: 30000 
                 });
                 
-                // Заменяем waitForTimeout на setTimeout
-                await new Promise(resolve => setTimeout(resolve, 5000));
+                if (!response || response.status() !== 200) {
+                  console.log('❌ GitHub Pages returned status:', response?.status() || 'unknown');
+                  console.log('SCREENSHOT_SUCCESS=false');
+                  return;
+                }
                 
-                await page.evaluate(async () => {
-                  await new Promise(resolve => {
+                const pageTitle = await page.title();
+                const pageContent = await page.content();
+                
+                const hasMeaningfulContent = pageContent.length > 500 && 
+                                           !pageTitle.includes('404') &&
+                                           !pageContent.includes('There isn\\'t a GitHub Pages site here');
+                
+                if (!hasMeaningfulContent) {
+                  console.log('❌ GitHub Pages has insufficient content');
+                  console.log('SCREENSHOT_SUCCESS=false');
+                  return;
+                }
+                
+                console.log('✅ GitHub Pages is accessible with meaningful content');
+                console.log('📸 Taking screenshot...');
+                
+                // Оптимізоване очікування без перезагрузок
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Швидке прогортування без анімацій
+                await page.evaluate(() => {
+                  return new Promise(resolve => {
                     let totalHeight = 0;
-                    const distance = 100;
+                    const distance = 200;
                     const timer = setInterval(() => {
                       const scrollHeight = document.body.scrollHeight;
                       window.scrollBy(0, distance);
@@ -412,22 +350,18 @@ jobs:
                         clearInterval(timer);
                         resolve();
                       }
-                    }, 100);
+                    }, 50);
                   });
                 });
                 
-                // Заменяем waitForTimeout на setTimeout
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 await page.evaluate(() => window.scrollTo(0, 0));
-                
-                // Заменяем waitForTimeout на setTimeout
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
+                // Виправлена конфігурація скріншота - прибрано quality для PNG
                 await page.screenshot({ 
                   path: screenshotPath, 
                   fullPage: true,
-                  quality: 80,
                   type: 'png'
                 });
                 
@@ -449,7 +383,7 @@ jobs:
                 }
                 
               } catch (screenshotError) {
-                console.log('❌ Screenshot capture failed:', screenshotError.message);
+                console.log('❌ Screenshot process failed:', screenshotError.message);
                 console.log('SCREENSHOT_SUCCESS=false');
               }
               
@@ -491,6 +425,7 @@ jobs:
           fi
 
           rm -f screenshot_output.log
+
       - name: 📝 Update README with all content
         run: |
           REPO_URL="https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}"
