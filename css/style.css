@@ -724,6 +724,14 @@ img {
   margin-bottom: 72px;
 }
 
+.portfolio-wrap {
+  /* Відносне позиціонування для overlay */
+  position: relative;
+
+  /* Приховуємо контент, що виходить за межі */
+  overflow: hidden;
+}
+
 .portfolio-list {
   /* Розміщуємо елементи portfolio в рядок */
   display: flex;
@@ -739,14 +747,8 @@ img {
 }
 
 .portfolio-item {
-  /* Відносне позиціонування для overlay */
-  position: relative;
-
   /* Базовий розмір flex-елемента: 3 елементи в рядок */
   flex-basis: calc((100% - 48px) / 3);
-
-  /* Приховуємо контент, що виходить за межі */
-  overflow: hidden;
 
   /* Нижня рамка елементів portfolio */
   border-bottom: 1px solid var(--cornflower);
@@ -754,7 +756,7 @@ img {
   /* Плавний перехід тіні та трансформації */
   transition:
     box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .portfolio-item:focus,
@@ -783,10 +785,8 @@ img {
   /* Позиція зліва */
   left: 0;
 
-  /* Ширина overlay */
+  /* Ширина та висота overlay */
   width: 100%;
-
-  /* Висота overlay */
   height: 100%;
 
   /* Внутрішні відступи overlay */
